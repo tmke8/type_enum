@@ -55,4 +55,3 @@ def test_namedtuple_matching() -> None:
             pass
         case _:
             assert False
-

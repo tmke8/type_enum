@@ -56,10 +56,12 @@ def test_generic() -> None:
 
 def test_invalid_body() -> None:
     with pytest.raises(TypeError):
+
         class T(TypeEnum):
             A = 0
 
     with pytest.raises(TypeError):
+
         class U(TypeEnum):
             def f(self) -> int:
                 return 0
