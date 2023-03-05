@@ -22,8 +22,8 @@ jobs:
         pip install 'black<=23'
     - name: Format with black
       run: |
-        python -m black -t py310 type_enum/
-        python -m black -t py310 tests/
+        python -m black --check -t py310 type_enum/
+        python -m black --check -t py310 tests/
 
   run_tests:
     runs-on: ubuntu-latest
@@ -42,6 +42,6 @@ jobs:
           # keep the following in sync with `test_with_pytest`!
           poetry env use 3.10
           poetry install --no-interaction --no-root
-      - name: Test import
+      - name: Run tests
         run: |
           poetry run python -m pytest -vv tests
