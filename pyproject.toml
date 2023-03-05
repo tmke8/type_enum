@@ -1,11 +1,18 @@
 [tool.poetry]
 name = "type-enum"
-version = "0.1.0"
-description = "Sum types in Python."
+version = "0.0.9"
+description = "Concise sum types in Python."
 authors = ["Thomas MK <tmke8@posteo.net>"]
 license = "Apache License 2.0"
 readme = "README.md"
 packages = [{include = "type_enum"}]
+classifiers=[
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+repository="https://github.com/tmke8/type_enum"
 
 [tool.poetry.dependencies]
 python = "^3.10"
