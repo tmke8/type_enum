@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "type-enum"
+version = "0.1.0"
+description = "Sum types in Python."
+authors = ["Thomas MK <tmke8@posteo.net>"]
+license = "Apache License 2.0"
+readme = "README.md"
+packages = [{include = "type_enum"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+ruff = "^0.0.254"
+mypy = "^1.0.1"
+pytest = "^7.2.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
