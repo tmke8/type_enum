@@ -8,6 +8,8 @@ def test_subclass() -> None:
         C = {"x": int, "y": str}
         D = {}  # type: ignore[var-annotated]
 
+    TA: type[T] = T.A
+    a: T = T.A(3)
     assert issubclass(T.A, T)
     assert isinstance(T.A(3), T)
     assert isinstance(T.A(3), T.A)
