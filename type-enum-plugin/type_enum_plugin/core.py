@@ -123,7 +123,7 @@ class TypeEnumTransform:
 
                 self.create_namedtuple(lhs.name, fieldnames, fieldtypes, stmt.line)
             else:
-                self.api.fail(f"Only tuples or dicts are allowed in a TypeEnum", stmt)
+                self.api.fail("Only tuples or dicts are allowed in a TypeEnum", stmt)
 
             # current_attr_names.add(lhs.name)
             # found_attrs[lhs.name] = TypeEnumEntry(
@@ -164,6 +164,10 @@ class TypeEnumTransform:
             line=line,
             existing_info=None,
         )
+
+        # add the surrounding class as a base class
+        info.mro.append(self.cls.info)
+
         node = SymbolTableNode(MDEF, info)
         self.api.add_symbol_table_node(name, node)
 
