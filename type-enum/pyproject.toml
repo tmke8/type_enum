@@ -22,6 +22,16 @@ black = "^23.1.0"
 ruff = "^0.0.254"
 mypy = "^1.0.1"
 pytest = "^7.2.2"
+type-enum-plugin = { path = "../type-enum-plugin/", develop = true }
+
+[tool.mypy]
+plugins = "type_enum_plugin"
+strict = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = ["type_enum.*"]
+ignore_errors = true
 
 [build-system]
 requires = ["poetry-core"]

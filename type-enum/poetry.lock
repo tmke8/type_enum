@@ -301,6 +301,23 @@ files = [
 ]
 
 [[package]]
+name = "type-enum-plugin"
+version = "0.1.1a0"
+description = "Mypy plugin for type-enum."
+category = "dev"
+optional = false
+python-versions = "^3.10"
+files = []
+develop = true
+
+[package.dependencies]
+mypy = "*"
+
+[package.source]
+type = "directory"
+url = "../type-enum-plugin"
+
+[[package]]
 name = "typing-extensions"
 version = "4.5.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -315,4 +332,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "ac9f6f1fd30db0db72b0baf8b1676ee9762ff2b7e63c2c64c85ae3f3b1110b32"
+content-hash = "8921017c2c4ff4d48cd8bc1b429e89b7eb276e218db987949a63570e48650ea7"

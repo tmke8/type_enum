@@ -1,4 +1,5 @@
 from typing import Generic, TypeVar
+from typing_extensions import assert_type
 import pytest
 
 from type_enum import TypeEnum
@@ -10,16 +11,19 @@ def test_num_args() -> None:
         B = (int, str)
         C = ()
 
-    T.A(3)
-    T.B(0, "foo")
+    a = T.A(3)
+    assert_type(a[0], int)
+    b = T.B(0, "foo")
+    assert_type(b[0], int)
+    assert_type(b[1], str)
     T.C()
 
     with pytest.raises(TypeError):
-        T.A()
+        T.A()  # type: ignore[call-arg]
     with pytest.raises(TypeError):
-        T.C(0)
+        T.C(0)  # type: ignore[call-arg]
     with pytest.raises(TypeError):
-        T.B("foo")
+        T.B("foo")  # type: ignore[call-arg,arg-type]
 
 
 def test_field_name() -> None:
@@ -35,30 +39,31 @@ def test_field_name() -> None:
     T.C()
 
     with pytest.raises(TypeError):
-        T.A()
+        T.A()  # type: ignore[call-arg]
     with pytest.raises(TypeError):
-        T.C(0)
+        T.C(0)  # type: ignore[call-arg]
     with pytest.raises(TypeError):
-        T.B("foo", 3)
+        T.B("foo", 3)  # type: ignore[call-arg,arg-type]
 
 
 def test_generic() -> None:
     U = TypeVar("U")
 
     class T(TypeEnum, Generic[U]):
-        A = (int,)
+        A = (U,)
         B = (int, str)
         C = ()
 
     T[int]
-    T[int].A(3)
+    a = T[int].A(3)
+    assert_type(a[0], int)
 
 
 def test_invalid_body() -> None:
     with pytest.raises(TypeError):
 
         class T(TypeEnum):
-            A = 0
+            A = 0  # type: ignore[misc]
 
     with pytest.raises(TypeError):
 
