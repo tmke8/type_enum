@@ -70,3 +70,10 @@ def test_invalid_body() -> None:
         class U(TypeEnum):
             def f(self) -> int:
                 return 0
+
+
+def test_invalid_baseclass() -> None:
+    with pytest.raises(TypeError):
+
+        class T(TypeEnum, int):
+            pass

@@ -1,6 +1,6 @@
 from operator import itemgetter
 import sys
-from typing import Any, Iterator, NamedTuple
+from typing import Any, Generic, Iterator, NamedTuple
 
 from ._utils import is_dunder, type_to_str
 
@@ -17,26 +17,32 @@ except ImportError:
 class TypeEnumMeta(type):
     """Metaclass for TypeEnum."""
 
-    def __new__(metacls, cls: str, bases: tuple[type, ...], classdict: dict[str, Any]):
+    def __new__(cls, name: str, bases: tuple[type, ...], ns: dict[str, Any]):
+        for base in bases:
+            if type(base) is not TypeEnumMeta and base is not Generic:
+                raise TypeError(
+                    "cannot inherit from both a TypeEnum type "
+                    "and a non-TypeEnum base class"
+                )
         member_map: dict[str, type] = {}
-        for name in classdict:
-            if is_dunder(name):
+        for attr_name in ns:
+            if is_dunder(attr_name):
                 continue
-            types = classdict[name]
+            types = ns[attr_name]
             if isinstance(types, tuple):
-                subtype = _create_tuple_class(cls, name, types)
+                subtype = _create_tuple_class(name, attr_name, types)
             elif isinstance(types, dict):
-                subtype = NamedTuple(name, [(k, v) for k, v in types.items()])
+                subtype = NamedTuple(attr_name, [(k, v) for k, v in types.items()])
             else:
                 raise TypeError(
                     "A TypeEnum may only contain variables of tuples or dictionaries."
                 )
-            classdict[name] = subtype
-            member_map[name] = subtype
-        classdict["_member_map"] = member_map
+            ns[attr_name] = subtype
+            member_map[attr_name] = subtype
+        ns["_member_map"] = member_map
         try:
             exc = None
-            enum_class = super().__new__(metacls, cls, bases, classdict)
+            enum_class = super().__new__(cls, name, bases, ns)
         except RuntimeError as e:
             # any exceptions raised by member.__new__ will get converted to a
             # RuntimeError, so get that original exception back and raise it instead
