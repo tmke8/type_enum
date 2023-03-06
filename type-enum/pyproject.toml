@@ -33,6 +33,18 @@ warn_unused_ignores = true
 module = ["type_enum.*"]
 ignore_errors = true
 
+[tool.ruff]
+select = [
+    "I", # isort
+]
+
+[tool.ruff.isort]
+known-third-party = ["mypy", "pytest"]
+extra-standard-library = ["__future__", "typing_extensions"]
+force-sort-within-sections = true
+split-on-trailing-comma = false
+#classes = []
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
