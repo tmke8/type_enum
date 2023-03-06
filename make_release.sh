@@ -50,6 +50,11 @@ bump_build_publish() {
   poetry version $version_bump
 
   echo "#######################################"
+  echo "#         stage pyroject.toml         #"
+  echo "#######################################"
+  git add pyproject.toml
+
+  echo "#######################################"
   echo "#            do new build             #"
   echo "#######################################"
   poetry build
@@ -87,7 +92,6 @@ git checkout -b $branch_name
 echo "#######################################"
 echo "#       commit version change         #"
 echo "#######################################"
-git add pyproject.toml
 git commit -m "Bump version"
 
 echo "#######################################"
@@ -96,15 +100,30 @@ echo "#######################################"
 new_tag=v${new_version}
 git tag $new_tag
 
-echo "#######################################"
-echo "#      bump prerelease version        #"
-echo "#######################################"
-poetry version prerelease
+bump_to_prerelease() {
+  echo "#######################################"
+  echo "#           entering '$1'             #"
+  echo "#######################################"
+  pushd $1
 
-echo "#######################################"
-echo "#       commit version change         #"
-echo "#######################################"
-git add pyproject.toml
+  echo "#######################################"
+  echo "#      bump prerelease version        #"
+  echo "#######################################"
+  poetry version prerelease
+
+  echo "#######################################"
+  echo "#       commit version change         #"
+  echo "#######################################"
+  git add pyproject.toml
+
+  echo "#######################################"
+  echo "#            leaving '$1'             #"
+  echo "#######################################"
+  popd  # switch back to previous directory
+}
+bump_to_prerelease "type-enum"
+bump_to_prerelease "type-enum-plugin"
+
 git commit -m "Bump version to prerelease"
 
 echo "#######################################"
