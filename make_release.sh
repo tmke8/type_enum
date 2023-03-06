@@ -68,7 +68,9 @@ bump_build_publish() {
   popd  # switch back to previous directory
 }
 
+cp README.md ./type-enum/
 bump_build_publish "type-enum"
+rm ./type-enum/README.md
 bump_build_publish "type-enum-plugin"
 
 # get the version from 'type_enum'
