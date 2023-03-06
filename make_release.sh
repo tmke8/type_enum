@@ -38,24 +38,43 @@ echo "# ensure main branch is up-to-date  #"
 echo "######################################"
 git pull
 
-echo "#######################################"
-echo "#            bump version             #"
-echo "#######################################"
-poetry version $version_bump
+bump_build_publish() {
+  echo "#######################################"
+  echo "#           entering '$1'             #"
+  echo "#######################################"
+  pushd $1
+
+  echo "#######################################"
+  echo "#            bump version             #"
+  echo "#######################################"
+  poetry version $version_bump
+
+  echo "#######################################"
+  echo "#            do new build             #"
+  echo "#######################################"
+  poetry build
+
+  echo ""
+  echo "#######################################"
+  echo "#          publish package            #"
+  echo "#######################################"
+  # to use this, set up an API token with
+  #  `poetry config pypi-token.pypi <api token>`
+  poetry publish
+
+  echo "#######################################"
+  echo "#            leaving '$1'             #"
+  echo "#######################################"
+  popd  # switch back to previous directory
+}
+
+bump_build_publish "type-enum"
+bump_build_publish "type-enum-plugin"
+
+# get the version from 'type_enum'
+pushd type-enum
 new_version=$(poetry version -s)
-
-echo "#######################################"
-echo "#            do new build             #"
-echo "#######################################"
-poetry build
-
-echo ""
-echo "#######################################"
-echo "#          publish package            #"
-echo "#######################################"
-# to use this, set up an API token with
-#  `poetry config pypi-token.pypi <api token>`
-poetry publish
+popd
 
 echo "#######################################"
 echo "#         create new branch           #"
@@ -94,7 +113,7 @@ git push origin $branch_name $new_tag
 echo "#######################################"
 echo "#     create PR for version bump      #"
 echo "#######################################"
-gh pr create --title "Version bump $new_tag" --body "__Do not use squash merge!__" --base "main" --label version-bump
+gh pr create --title "Version bump $new_tag" --body "__Do not use squash merge__ !" --base "main" --label version-bump
 # the following command is allowed to fail; hence the "||:" at the end
 gh pr merge $branch_name --merge --admin || :
 

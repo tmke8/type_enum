@@ -5,6 +5,10 @@
 ```
 pip install type-enum
 ```
+And for the mypy plugin:
+```
+pip install type-enum-plugin
+```
 
 ### Usage
 

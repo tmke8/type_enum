@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "type-enum"
+name = "type-enum-plugin"
 version = "0.1.1a0"
-description = "Concise sum types in Python."
+description = "Mypy plugin for type-enum."
 authors = ["Thomas MK <tmke8@posteo.net>"]
 license = "Apache License 2.0"
 readme = "README.md"
-packages = [{include = "type_enum"}]
+packages = [{include = "type_enum_plugin"}]
 classifiers=[
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -16,12 +16,12 @@ repository="https://github.com/tmke8/type_enum"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+mypy = "*"
 
 [tool.poetry.group.dev.dependencies]
+mypy = "^1.0.1"
 black = "^23.1.0"
 ruff = "^0.0.254"
-mypy = "^1.0.1"
-pytest = "^7.2.2"
 
 [build-system]
 requires = ["poetry-core"]

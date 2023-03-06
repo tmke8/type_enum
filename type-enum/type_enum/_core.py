@@ -2,7 +2,7 @@ from operator import itemgetter
 import sys
 from typing import Any, Iterator, NamedTuple
 
-from type_enum.utils import is_dunder, type_to_str
+from ._utils import is_dunder, type_to_str
 
 __all__ = ["TypeEnum"]
 

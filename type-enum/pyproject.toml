@@ -1,0 +1,50 @@
+[tool.poetry]
+name = "type-enum"
+version = "0.1.1a0"
+description = "Concise sum types in Python."
+authors = ["Thomas MK <tmke8@posteo.net>"]
+license = "Apache License 2.0"
+readme = "../README.md"
+packages = [{include = "type_enum"}]
+classifiers=[
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+repository="https://github.com/tmke8/type_enum"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+ruff = "^0.0.254"
+mypy = "^1.0.1"
+pytest = "^7.2.2"
+type-enum-plugin = { path = "../type-enum-plugin", develop = true }
+
+[tool.mypy]
+plugins = "type_enum_plugin"
+strict = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = ["type_enum.*"]
+ignore_errors = true
+
+[tool.ruff]
+select = [
+    "I", # isort
+]
+
+[tool.ruff.isort]
+known-third-party = ["mypy", "pytest"]
+extra-standard-library = ["__future__", "typing_extensions"]
+force-sort-within-sections = true
+split-on-trailing-comma = false
+#classes = []
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
