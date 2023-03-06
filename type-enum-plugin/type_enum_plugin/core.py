@@ -108,7 +108,7 @@ class TypeEnumTransform:
                     if isinstance(key, StrExpr):
                         fieldnames.append(key.value)
                     else:
-                        self.api.fail("Keys must be strings", stmt)
+                        self.api.fail("Dictionary keys in a TypeEnum must be strings", stmt)
                         aborted = True
                         break
                     analyzed = self.get_type_from_expression(type_node)
@@ -121,7 +121,7 @@ class TypeEnumTransform:
 
                 self.create_namedtuple(lhs.name, fieldnames, fieldtypes, stmt.line)
             else:
-                self.api.fail(f"Only tuples or dicts are allowed", stmt)
+                self.api.fail(f"Only tuples or dicts are allowed in a TypeEnum", stmt)
 
             # current_attr_names.add(lhs.name)
             # found_attrs[lhs.name] = TypeEnumEntry(
