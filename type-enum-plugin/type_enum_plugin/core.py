@@ -108,7 +108,9 @@ class TypeEnumTransform:
                     if isinstance(key, StrExpr):
                         fieldnames.append(key.value)
                     else:
-                        self.api.fail("Dictionary keys in a TypeEnum must be strings", stmt)
+                        self.api.fail(
+                            "Dictionary keys in a TypeEnum must be strings", stmt
+                        )
                         aborted = True
                         break
                     analyzed = self.get_type_from_expression(type_node)
