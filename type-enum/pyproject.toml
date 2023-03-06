@@ -4,7 +4,7 @@ version = "0.1.1a0"
 description = "Concise sum types in Python."
 authors = ["Thomas MK <tmke8@posteo.net>"]
 license = "Apache License 2.0"
-readme = "../README.md"
+readme = "README.md"
 packages = [{include = "type_enum"}]
 classifiers=[
     "Programming Language :: Python :: 3.10",
