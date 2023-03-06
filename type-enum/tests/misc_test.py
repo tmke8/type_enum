@@ -6,7 +6,7 @@ def test_subclass() -> None:
         A = (int,)
         B = ()
         C = {"x": int, "y": str}
-        D = {}
+        D = {}  # type: ignore[var-annotated]
 
     assert issubclass(T.A, T)
     assert isinstance(T.A(3), T)

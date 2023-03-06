@@ -33,7 +33,7 @@ def test_namedtuple_matching() -> None:
     class T(TypeEnum):
         A = {"x": int, "y": str}
         B = {"val": bool}
-        C = {}
+        C = {}  # type: ignore[var-annotated]
 
     a = T.A(x=3, y="foo")
     match a:

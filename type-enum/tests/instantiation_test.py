@@ -30,7 +30,7 @@ def test_field_name() -> None:
     class T(TypeEnum):
         A = {"x": int, "y": str}
         B = {"val": bool}
-        C = {}
+        C = {}  # type: ignore[var-annotated]
 
     T.A(x=3, y="foo")
     T.A(3, y="foo")
@@ -50,13 +50,13 @@ def test_generic() -> None:
     U = TypeVar("U")
 
     class T(TypeEnum, Generic[U]):
-        A = (U,)
+        A = (U,)  # type: ignore[misc]
         B = (int, str)
         C = ()
 
     T[int]
-    a = T[int].A(3)
-    assert_type(a[0], int)
+    a = T[int].A(3)  # type: ignore[arg-type]
+    assert_type(a[0], int)  # type: ignore[assert-type]
 
 
 def test_invalid_body() -> None:

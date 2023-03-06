@@ -10,7 +10,7 @@ def test_repr() -> None:
         C = ()
         D = {"x": int, "y": str}
         E = {"val": bool}
-        F = {}
+        F = {}  # type: ignore[var-annotated]
 
     assert repr(T.A(3)) == "T.A(3)"
     assert repr(T.B(0, "foo")) == "T.B(0, 'foo')"
