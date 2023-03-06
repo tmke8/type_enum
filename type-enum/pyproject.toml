@@ -6,6 +6,7 @@ authors = ["Thomas MK <tmke8@posteo.net>"]
 license = "Apache License 2.0"
 readme = "README.md"
 packages = [{include = "type_enum"}]
+include=["type_enum/py.typed"]
 classifiers=[
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
