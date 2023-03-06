@@ -71,8 +71,7 @@ jobs:
         pip install 'black<=23'
     - name: Format with black
       run: |
-        python -m black --check -t py310 type_enum/
-        python -m black --check -t py310 tests/
+        python -m black --check -t py310 type_enum_plugin
 
   run_tests:
     runs-on: ubuntu-latest
