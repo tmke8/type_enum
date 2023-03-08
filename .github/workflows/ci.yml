@@ -94,7 +94,7 @@ jobs:
           poetry install --no-interaction --no-root
       - name: Run tests
         run: |
-          poetry run python -m pytest -vv tests
+          poetry run python -m unittest -v
 
   type_check:
     runs-on: ubuntu-latest
