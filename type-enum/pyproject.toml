@@ -1,29 +1,44 @@
-[tool.poetry]
+[project]
 name = "type-enum"
-version = "0.2.2a0"
-description = "Concise sum types in Python."
-authors = ["Thomas MK <tmke8@posteo.net>"]
-license = "Apache License 2.0"
-readme = "README.md"
-packages = [{include = "type_enum"}]
-include=["type_enum/py.typed"]
-classifiers=[
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "License :: OSI Approved :: Apache Software License",
-    "Operating System :: OS Independent",
+description = 'Concise sum types in Python.'
+readme = "../README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+keywords = []
+authors = [
+  { name = "Thomas MK", email = "tmke8@posteo.net" },
 ]
-repository="https://github.com/tmke8/type_enum"
+classifiers = [
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+]
+dependencies = []
+dynamic = ["version"]
 
-[tool.poetry.dependencies]
-python = "^3.10"
+[project.urls]
+Documentation = "https://github.com/tmke8/type-enum#readme"
+Issues = "https://github.com/tmke8/type-enum/issues"
+Source = "https://github.com/tmke8/type-enum"
 
-[tool.poetry.group.dev.dependencies]
-black = "^23.1.0"
-ruff = "^0.0.254"
-mypy = "^1.0.1"
-type-enum-plugin = { path = "../type-enum-plugin", develop = true }
-typing-extensions = "^4.5.0"
+[tool.hatch.version]
+path = "type_enum/__init__.py"
+
+[tool.hatch.envs.default]
+dependencies = [
+  "black ~= 23.1",
+  "mypy ~= 1.0",
+  "ruff >= 0.0.254",
+  "type-enum-plugin @ {root:uri}/../type-enum-plugin",
+  "typing-extensions >= 4.5.0",
+]
+
+[tool.hatch.envs.default.scripts]
+test = "python -m unittest -v"
+
+[[tool.hatch.envs.test.matrix]]
+python = ["310", "311"]
 
 [tool.mypy]
 plugins = "type_enum_plugin"
@@ -47,5 +62,5 @@ split-on-trailing-comma = false
 #classes = []
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
