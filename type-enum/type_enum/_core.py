@@ -32,6 +32,11 @@ class TypeEnumMeta(type):
             if isinstance(types, tuple):
                 subtype = _create_tuple_class(name, attr_name, types)
             elif isinstance(types, dict):
+                for k in types:
+                    if k in ns:
+                        raise TypeError(
+                            f"'{k}' appears in namespace and in '{attr_name}'"
+                        )
                 subtype = NamedTuple(attr_name, [(k, v) for k, v in types.items()])
             else:
                 raise TypeError(

@@ -39,6 +39,7 @@ class TypeEnumTransform:
     def transform(self) -> None:
         """Transform the attributes in a TypeEnum."""
         cls = self.cls
+        cls.info.is_final = True
         for stmt in cls.defs.body:
             # Any assignment that doesn't use the new type declaration
             # syntax can be ignored out of hand.
@@ -134,6 +135,11 @@ class TypeEnumTransform:
             #     info=cls.info,
             # )
 
+            # == attempts to make the namespace class abstract ==
+            # n = cls.info.names["__init__"].node
+            # assert isinstance(n, FuncDef)
+            # n.abstract_status = 2
+
     def get_type_from_expression(self, type_node: Expression) -> Type | None:
         try:
             type = expr_to_unanalyzed_type(
@@ -164,6 +170,7 @@ class TypeEnumTransform:
             line=line,
             existing_info=None,
         )
+        info.is_final = True
 
         # add the surrounding class as a base class
         info.mro.append(self.cls.info)
