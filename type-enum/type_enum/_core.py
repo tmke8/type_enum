@@ -34,7 +34,9 @@ class TypeEnumMeta(type):
             elif isinstance(types, dict):
                 for k in types:
                     if k in ns:
-                        raise TypeError(f"'{k}' appears in namespace and in '{attr_name}'")
+                        raise TypeError(
+                            f"'{k}' appears in namespace and in '{attr_name}'"
+                        )
                 subtype = NamedTuple(attr_name, [(k, v) for k, v in types.items()])
             else:
                 raise TypeError(
