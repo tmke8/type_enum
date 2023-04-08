@@ -1,3 +1,5 @@
+from typing_extensions import assert_type
+
 from type_enum import TypeEnum
 
 from .common import CustomTestCase
@@ -19,9 +21,9 @@ class MatchingTest(CustomTestCase):
 
         b = T.B(0, "foo")
         match b:
-            case T.B(x, y):
-                self.assertEqual(x, 0)
-                self.assertEqual(y, "foo")
+            case T.B(y, z):
+                self.assertEqual(y, 0)
+                self.assertEqual(z, "foo")
             case _:
                 self.fail(f"not matched: {b}")
 
@@ -40,9 +42,11 @@ class MatchingTest(CustomTestCase):
 
         a = T.A(x=3, y="foo")
         match a:
-            case T.A(x, y):
-                self.assertEqual(x, 3)
-                self.assertEqual(y, "foo")
+            case T.A(x=x_, y=y_):
+                self.assertEqual(x_, 3)
+                self.assertEqual(y_, "foo")
+                assert_type(x_, int)
+                assert_type(y_, str)
             case _:
                 self.fail(f"not matched: {a}")
 

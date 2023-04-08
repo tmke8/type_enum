@@ -82,7 +82,7 @@ class InstantiationTest(CustomTestCase):
 
         with self.assertRaises(TypeError):
 
-            class U(T):
+            class U(T):  # type: ignore[misc]
                 B = ()
 
     def test_instantiate_type_enum(self) -> None:
@@ -93,3 +93,10 @@ class InstantiationTest(CustomTestCase):
             T()
         with self.assertRaises(TypeError):
             TypeEnum()
+
+    def test_name_clash(self) -> None:
+        with self.assertRaises(TypeError):
+
+            class T(TypeEnum):
+                A = {"B": int}
+                B = (int, str)
