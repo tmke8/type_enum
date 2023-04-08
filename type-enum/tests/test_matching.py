@@ -63,3 +63,18 @@ class MatchingTest(CustomTestCase):
                 pass
             case _:
                 self.fail(f"not matched: {c}")
+
+    def test_exhaustiveness(self) -> None:
+        class Color(TypeEnum):
+            transparent = ()
+            name = (str,)
+
+        def f(color: Color) -> int:  # type: ignore[return]
+            match color:
+                case Color.transparent():
+                    return 0
+                case Color.name(color_name):
+                    print(f"color name: {color_name}")
+                    return 0
+
+        self.assertEqual(f(Color.transparent()), 0)
