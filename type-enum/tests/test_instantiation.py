@@ -75,3 +75,21 @@ class InstantiationTest(CustomTestCase):
 
             class T(TypeEnum, int):
                 pass
+
+    def test_invalid_inheritance(self) -> None:
+        class T(TypeEnum):
+            A = ()
+
+        with self.assertRaises(TypeError):
+
+            class U(T):
+                B = ()
+
+    def test_instantiate_type_enum(self) -> None:
+        class T(TypeEnum):
+            A = (int,)
+
+        with self.assertRaises(TypeError):
+            T()
+        with self.assertRaises(TypeError):
+            TypeEnum()

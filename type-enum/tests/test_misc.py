@@ -16,6 +16,8 @@ class MiscTest(CustomTestCase):
         self.assertIsSubclass(T.A, T)
         self.assertIsInstance(T.A(3), T)
         self.assertIsInstance(T.A(3), T.A)
+        self.assertIsInstance(T.A(3), T.A.A)
+        self.assertIsInstance(T.A(3), T.A.A.A)
 
         self.assertIsSubclass(T.B, T)
         self.assertIsInstance(T.B(), T)

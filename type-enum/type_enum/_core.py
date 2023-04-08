@@ -19,10 +19,10 @@ class TypeEnumMeta(type):
 
     def __new__(cls, name: str, bases: tuple[type, ...], ns: dict[str, Any]):
         for base in bases:
-            if type(base) is not TypeEnumMeta and base is not Generic:
+            if base is not TypeEnum and base is not Generic:
                 raise TypeError(
-                    "cannot inherit from both a TypeEnum type "
-                    "and a non-TypeEnum base class"
+                    "TypeEnum classes cannot be subclassed further "
+                    "and may only have Generic as an additional base class"
                 )
         member_map: dict[str, type] = {}
         for attr_name in ns:
@@ -39,7 +39,16 @@ class TypeEnumMeta(type):
                 )
             ns[attr_name] = subtype
             member_map[attr_name] = subtype
+
+        for subtype in member_map.values():
+            for subname_, subtype_ in member_map.items():
+                setattr(subtype, subname_, subtype_)
         ns["_member_map"] = member_map
+
+        def _init(self, *args: Any, **kwargs: Any) -> None:
+            raise TypeError("TypeEnum cannot be instantiated")
+
+        ns["__init__"] = _init
         try:
             exc = None
             enum_class = super().__new__(cls, name, bases, ns)
@@ -64,7 +73,7 @@ class TypeEnumMeta(type):
 def _create_tuple_class(basename: str, typename: str, types: tuple[type, ...]) -> type:
     """Create a new subclass of ``tuple``."""
     num_values = len(types)
-    _tuple = tuple
+    _tuple: type = tuple
 
     # ==================== methods for the new class ====================
     def __new__(cls, *args: type) -> tuple:
@@ -109,8 +118,9 @@ def _create_tuple_class(basename: str, typename: str, types: tuple[type, ...]) -
     for index, name in enumerate(field_names):
         doc = sys.intern(f"Alias for field number {index}")
         class_namespace[name] = _tuplegetter(index, doc)
-    return type(typename, (tuple,), class_namespace)
+    return type(typename, (_tuple,), class_namespace)
 
 
 class TypeEnum(metaclass=TypeEnumMeta):
-    pass
+    def __init_subclass__(cls, *args: Any, **kwargs: Any):
+        super().__init_subclass__(*args, **kwargs)
