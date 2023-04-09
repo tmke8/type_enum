@@ -67,14 +67,16 @@ class InstantiationTest(CustomTestCase):
         with self.assertRaises(TypeError):
 
             class U(TypeEnum):
-                def f(self) -> int:
+                A = ()
+
+                def f(self) -> int:  # type: ignore[misc]
                     return 0
 
     def test_invalid_baseclass(self) -> None:
         with self.assertRaises(TypeError):
 
             class T(TypeEnum, int):
-                pass
+                A = ()
 
     def test_invalid_inheritance(self) -> None:
         class T(TypeEnum):
@@ -100,3 +102,9 @@ class InstantiationTest(CustomTestCase):
             class T(TypeEnum):
                 A = {"B": int}
                 B = (int, str)
+
+    def test_empty_type_enum(self) -> None:
+        with self.assertRaises(TypeError):
+
+            class T(TypeEnum):  # type: ignore[misc]
+                pass

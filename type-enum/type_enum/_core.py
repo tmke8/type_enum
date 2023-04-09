@@ -1,6 +1,7 @@
-from operator import itemgetter
+import functools
+from operator import itemgetter, or_
 import sys
-from typing import Any, Generic, Iterator, NamedTuple
+from typing import Any, Generic, Iterator, NamedTuple, Union
 
 from ._utils import is_dunder, type_to_str
 
@@ -45,6 +46,9 @@ class TypeEnumMeta(type):
             ns[attr_name] = subtype
             member_map[attr_name] = subtype
 
+        if not member_map and name != "TypeEnum":
+            raise TypeError("Empty TypeEnum.")
+
         for subtype in member_map.values():
             for subname_, subtype_ in member_map.items():
                 setattr(subtype, subname_, subtype_)
@@ -54,6 +58,9 @@ class TypeEnumMeta(type):
             raise TypeError("TypeEnum cannot be instantiated")
 
         ns["__init__"] = _init
+        subtypes = list(member_map.values())
+        if name != "TypeEnum":
+            ns["ALL"] = functools.reduce(or_, subtypes[1:], Union[subtypes[0]])
         try:
             exc = None
             enum_class = super().__new__(cls, name, bases, ns)

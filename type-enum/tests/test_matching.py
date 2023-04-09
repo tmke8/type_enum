@@ -1,8 +1,17 @@
+from __future__ import annotations
 from typing_extensions import assert_type
 
 from type_enum import TypeEnum
 
 from .common import CustomTestCase
+
+
+# the following forces mypy to evaluate the file twice
+c: C
+
+
+class C:
+    ...
 
 
 class MatchingTest(CustomTestCase):
@@ -69,7 +78,7 @@ class MatchingTest(CustomTestCase):
             transparent = ()
             name = (str,)
 
-        def f(color: Color) -> int:  # type: ignore[return]
+        def f(color: Color.ALL) -> int:
             match color:
                 case Color.transparent():
                     return 0
