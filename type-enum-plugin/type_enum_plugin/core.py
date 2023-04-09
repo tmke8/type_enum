@@ -9,6 +9,7 @@ from mypy.nodes import (
     DictExpr,
     Expression,
     MDEF,
+    FuncDef,
     NameExpr,
     PlaceholderNode,
     Statement,
@@ -22,7 +23,7 @@ from mypy.nodes import (
 )
 from mypy.plugin import ClassDefContext, Plugin, SemanticAnalyzerPluginInterface
 from mypy.semanal_namedtuple import NamedTupleAnalyzer
-from mypy.types import AnyType, Type, TypeOfAny, UnboundType
+from mypy.types import AnyType, Instance, Type, TypeOfAny, UnboundType, UnionType
 
 __all__ = ["plugin"]
 
@@ -40,13 +41,19 @@ class TypeEnumTransform:
         """Transform the attributes in a TypeEnum."""
         cls = self.cls
         cls.info.is_final = True
+        variants: list[tuple[TypeInfo, int]] = []
+        error_reported = False
         for stmt in cls.defs.body:
             # Any assignment that doesn't use the new type declaration
             # syntax can be ignored out of hand.
             if not (isinstance(stmt, AssignmentStmt)):
+                if isinstance(stmt, FuncDef):
+                    self.api.fail("No function definitions allowed in TypeEnum", stmt)
+                    error_reported = True
                 continue
             elif stmt.new_syntax:
                 self.api.fail("No type annotations allowed in TypeEnum", stmt)
+                error_reported = True
                 continue
 
             # a: int, b: str = 1, 'foo' is not supported syntax so we
@@ -54,6 +61,7 @@ class TypeEnumTransform:
             lhs = stmt.lvalues[0]
             if not isinstance(lhs, NameExpr):
                 self.api.fail("No multiple assignments allowed in TypeEnum", stmt)
+                error_reported = True
                 continue
 
             sym = cls.info.names.get(lhs.name)
@@ -69,21 +77,29 @@ class TypeEnumTransform:
                     ("Type aliases inside TypeEnum are not supported at runtime"),
                     node,
                 )
+                error_reported = True
                 # Skip processing this node. This doesn't match the runtime behaviour,
                 # but the only alternative would be to modify the SymbolTable,
                 # and it's a little hairy to do that in a plugin.
                 continue
 
-            assert isinstance(node, Var)
+            if isinstance(node, TypeInfo):
+                # we'll assume that this has already been analyzed
+                variants.append((node, node.line))
+                continue
+
+            assert isinstance(node, Var), type(node)
 
             # x: ClassVar[int] is ignored by dataclasses.
             if node.is_classvar:
                 self.api.fail("No ClassVars in TypeEnum.", node)
+                error_reported = True
                 continue
 
             # All other assignments are already type checked.
             if isinstance(stmt.rvalue, TempNode):
                 self.api.fail("All variables need values.", stmt)
+                error_reported = True
                 continue
 
             if isinstance(stmt.rvalue, TupleExpr):
@@ -98,9 +114,10 @@ class TypeEnumTransform:
                     types.append(analyzed)
                 if aborted:
                     continue
-                self.create_namedtuple(
+                info = self.create_namedtuple(
                     lhs.name, [f"_{i}" for i in range(len(types))], types, stmt.line
                 )
+                variants.append((info, stmt.line))
             elif isinstance(stmt.rvalue, DictExpr):
                 fieldnames: list[str] = []
                 fieldtypes: list[Type] = []
@@ -122,23 +139,47 @@ class TypeEnumTransform:
                 if aborted:
                     continue
 
-                self.create_namedtuple(lhs.name, fieldnames, fieldtypes, stmt.line)
+                info = self.create_namedtuple(
+                    lhs.name, fieldnames, fieldtypes, stmt.line
+                )
+                variants.append((info, stmt.line))
             else:
                 self.api.fail("Only tuples or dicts are allowed in a TypeEnum", stmt)
+                error_reported = True
 
-            # current_attr_names.add(lhs.name)
-            # found_attrs[lhs.name] = TypeEnumEntry(
-            #     name=lhs.name,
-            #     line=stmt.line,
-            #     column=stmt.column,
-            #     value=stmt.rvalue,
-            #     info=cls.info,
-            # )
+        if not variants and not error_reported:
+            self.api.fail("Empty TypeEnum.", self.cls)
 
-            # == attempts to make the namespace class abstract ==
-            # n = cls.info.names["__init__"].node
-            # assert isinstance(n, FuncDef)
-            # n.abstract_status = 2
+        if False:
+            existing = self.api.lookup_fully_qualified_or_none(self.cls.fullname)
+            assert existing is not None and existing.node is not None
+            if not isinstance(existing.node, TypeAlias):
+                typ = UnionType.make_union(
+                    [Instance(typ, [], line) for typ, line in variants]
+                )
+                alias = TypeAlias(
+                    typ, self.cls.fullname, self.reason.line, self.reason.column
+                )
+                existing.node = alias
+                breakpoint()
+
+        existing = self.api.lookup_qualified("ALL", self.cls)
+        if (
+            existing is None
+            or existing.node is None
+            or not isinstance(existing.node, TypeAlias)
+        ):
+            typ = UnionType.make_union(
+                [Instance(typ, [], line) for typ, line in variants]
+            )
+            alias = TypeAlias(
+                typ,
+                self.api.qualified_name("ALL"),
+                self.reason.line,
+                self.reason.column,
+            )
+            aliasnode = SymbolTableNode(MDEF, alias)
+            self.api.add_symbol_table_node("ALL", aliasnode)
 
     def get_type_from_expression(self, type_node: Expression) -> Type | None:
         try:
@@ -160,7 +201,7 @@ class TypeEnumTransform:
         types: list[Type],
         line: int,
         # basename: str,
-    ) -> None:
+    ) -> TypeInfo:
         info = self.namedtuple_builder.build_namedtuple_typeinfo(
             # name=f"{name}@{basename}",
             name=name,
@@ -177,26 +218,17 @@ class TypeEnumTransform:
 
         node = SymbolTableNode(MDEF, info)
         self.api.add_symbol_table_node(name, node)
+        return info
 
     @cached_property
     def namedtuple_builder(self) -> NamedTupleAnalyzer:
         return NamedTupleAnalyzer(self.api.options, self.api)  # type: ignore
 
 
-@dataclass
-class TypeEnumEntry:
-    name: str
-    line: int
-    column: int
-    value: Expression
-    info: TypeInfo
-
-
 class TypeEnumPlugin(Plugin):
     def get_base_class_hook(
         self, fullname: str
     ) -> Callable[[ClassDefContext], None] | None:
-        # if fullname == "type_enum.TypeEnum":
         if fullname == "type_enum._core.TypeEnum":
             return type_enum_callback
 

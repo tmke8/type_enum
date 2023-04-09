@@ -14,7 +14,9 @@ class MiscTest(CustomTestCase):
         TA: type[T] = T.A
         a: T = T.A(3)
         self.assertIsSubclass(T.A, T)
+        self.assertIsSubclass(T.A, T.ALL)  # type: ignore[arg-type]
         self.assertIsInstance(T.A(3), T)
+        self.assertIsInstance(T.A(3), T.ALL)  # type: ignore[arg-type]
         self.assertIsInstance(T.A(3), T.A)
         self.assertIsInstance(T.A(3), T.A.A)
         self.assertIsInstance(T.A(3), T.A.A.A)
