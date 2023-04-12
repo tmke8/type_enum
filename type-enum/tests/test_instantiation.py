@@ -113,4 +113,4 @@ class InstantiationTest(CustomTestCase):
         with self.assertRaises(TypeError):
 
             class E(TypeEnum):
-                A = {}  # type: ignore[var-annotated]
+                A = {}  # type: ignore[var-annotated,misc]

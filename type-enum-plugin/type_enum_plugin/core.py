@@ -119,6 +119,10 @@ class TypeEnumTransform:
                 )
                 variants.append((info, stmt.line))
             elif isinstance(stmt.rvalue, DictExpr):
+                if not stmt.rvalue.items:
+                    self.api.fail("Dictionaries in a TypeEnum may not be empty", stmt)
+                    error_reported = True
+                    continue
                 fieldnames: list[str] = []
                 fieldtypes: list[Type] = []
                 aborted = False
