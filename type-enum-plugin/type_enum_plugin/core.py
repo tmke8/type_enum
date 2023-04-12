@@ -23,7 +23,15 @@ from mypy.nodes import (
 )
 from mypy.plugin import ClassDefContext, Plugin, SemanticAnalyzerPluginInterface
 from mypy.semanal_namedtuple import NamedTupleAnalyzer
-from mypy.types import AnyType, Instance, Type, TypeOfAny, UnboundType, UnionType
+from mypy.types import (
+    AnyType,
+    Instance,
+    Type,
+    TypeOfAny,
+    TypeVarLikeType,
+    UnboundType,
+    UnionType,
+)
 
 __all__ = ["plugin"]
 
@@ -43,6 +51,15 @@ class TypeEnumTransform:
         cls.info.is_final = True
         variants: list[tuple[TypeInfo, int]] = []
         error_reported = False
+
+        if len(cls.info.bases) > 1:
+            self.api.fail(
+                "No other base classes allowed in TypeEnum except 'Generic'", cls
+            )
+
+        # if len(cls.info.type_vars) > 0:
+        #     self.api.fail("no type vars", cls)
+
         for stmt in cls.defs.body:
             # Any assignment that doesn't use the new type declaration
             # syntax can be ignored out of hand.
@@ -105,9 +122,11 @@ class TypeEnumTransform:
             if isinstance(stmt.rvalue, TupleExpr):
                 types: list[Type] = []
                 aborted = False
-                # tvar_defs = self.api.get_and_bind_all_tvars(stmt.rvalue.items)
+                # tvar_defs = self.get_and_bind_all_tvars(stmt.rvalue.items)
                 for type_node in stmt.rvalue.items:
                     analyzed = self.get_type_from_expression(type_node)
+                    if isinstance(analyzed, TypeVarLikeType):
+                        analyzed = AnyType(TypeOfAny.implementation_artifact)
                     if analyzed is None:
                         aborted = True
                         break
@@ -119,6 +138,10 @@ class TypeEnumTransform:
                 )
                 variants.append((info, stmt.line))
             elif isinstance(stmt.rvalue, DictExpr):
+                if not stmt.rvalue.items:
+                    self.api.fail("Dictionaries in a TypeEnum may not be empty", stmt)
+                    error_reported = True
+                    continue
                 fieldnames: list[str] = []
                 fieldtypes: list[Type] = []
                 aborted = False
@@ -150,20 +173,7 @@ class TypeEnumTransform:
         if not variants and not error_reported:
             self.api.fail("Empty TypeEnum.", self.cls)
 
-        if False:
-            existing = self.api.lookup_fully_qualified_or_none(self.cls.fullname)
-            assert existing is not None and existing.node is not None
-            if not isinstance(existing.node, TypeAlias):
-                typ = UnionType.make_union(
-                    [Instance(typ, [], line) for typ, line in variants]
-                )
-                alias = TypeAlias(
-                    typ, self.cls.fullname, self.reason.line, self.reason.column
-                )
-                existing.node = alias
-                breakpoint()
-
-        existing = self.api.lookup_qualified("ALL", self.cls)
+        existing = self.api.lookup_qualified("T", self.cls)
         if (
             existing is None
             or existing.node is None
@@ -174,12 +184,12 @@ class TypeEnumTransform:
             )
             alias = TypeAlias(
                 typ,
-                self.api.qualified_name("ALL"),
+                self.api.qualified_name("T"),
                 self.reason.line,
                 self.reason.column,
             )
             aliasnode = SymbolTableNode(MDEF, alias)
-            self.api.add_symbol_table_node("ALL", aliasnode)
+            self.api.add_symbol_table_node("T", aliasnode)
 
     def get_type_from_expression(self, type_node: Expression) -> Type | None:
         try:

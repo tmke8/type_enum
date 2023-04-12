@@ -16,42 +16,41 @@ class C:
 
 class MatchingTest(CustomTestCase):
     def test_tuple_matching(self) -> None:
-        class T(TypeEnum):
+        class E(TypeEnum):
             A = (int,)
             B = (int, str)
             C = ()
 
-        a = T.A(3)
+        a = E.A(3)
         match a:
-            case T.A(x):
+            case E.A(x):
                 self.assertEqual(x, 3)
             case _:
                 self.fail(f"not matched: {a}")
 
-        b = T.B(0, "foo")
+        b = E.B(0, "foo")
         match b:
-            case T.B(y, z):
+            case E.B(y, z):
                 self.assertEqual(y, 0)
                 self.assertEqual(z, "foo")
             case _:
                 self.fail(f"not matched: {b}")
 
-        c = T.C()
+        c = E.C()
         match c:
-            case T.C():
+            case E.C():
                 pass
             case _:
                 self.fail(f"not matched: {c}")
 
     def test_namedtuple_matching(self) -> None:
-        class T(TypeEnum):
+        class E(TypeEnum):
             A = {"x": int, "y": str}
             B = {"val": bool}
-            C = {}  # type: ignore[var-annotated]
 
-        a = T.A(x=3, y="foo")
+        a = E.A(x=3, y="foo")
         match a:
-            case T.A(x=x_, y=y_):
+            case E.A(x=x_, y=y_):
                 self.assertEqual(x_, 3)
                 self.assertEqual(y_, "foo")
                 assert_type(x_, int)
@@ -59,26 +58,19 @@ class MatchingTest(CustomTestCase):
             case _:
                 self.fail(f"not matched: {a}")
 
-        b = T.B(False)
+        b = E.B(False)
         match b:
-            case T.B(k):
+            case E.B(k):
                 self.assertFalse(k)
             case _:
                 self.fail(f"not matched: {b}")
-
-        c = T.C()
-        match c:
-            case T.C():
-                pass
-            case _:
-                self.fail(f"not matched: {c}")
 
     def test_exhaustiveness(self) -> None:
         class Color(TypeEnum):
             transparent = ()
             name = (str,)
 
-        def f(color: Color.ALL) -> int:
+        def f(color: Color.T) -> int:
             match color:
                 case Color.transparent():
                     return 0
