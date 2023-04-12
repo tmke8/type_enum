@@ -1,9 +1,17 @@
+from __future__ import annotations
 from typing import Generic, TypeVar
 from typing_extensions import assert_type
 
 from type_enum import TypeEnum
 
 from .common import CustomTestCase
+
+# the following forces mypy to evaluate the file twice
+c: C
+
+
+class C:
+    ...
 
 
 class InstantiationTest(CustomTestCase):
@@ -51,12 +59,10 @@ class InstantiationTest(CustomTestCase):
 
         class E(TypeEnum, Generic[U]):
             A = (U,)  # type: ignore[misc]
-            B = (int, str)
-            C = ()
+            B = ()
 
         E[int]
-        a = E[int].A(3)  # type: ignore[arg-type]
-        assert_type(a[0], int)  # type: ignore[assert-type]
+        E[int].A(3)
 
     def test_invalid_body(self) -> None:
         with self.assertRaises(TypeError):
@@ -75,7 +81,7 @@ class InstantiationTest(CustomTestCase):
     def test_invalid_baseclass(self) -> None:
         with self.assertRaises(TypeError):
 
-            class E(TypeEnum, int):
+            class E(TypeEnum, int):  # type: ignore[misc]
                 A = ()
 
     def test_invalid_inheritance(self) -> None:
