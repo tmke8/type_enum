@@ -47,7 +47,6 @@ class MatchingTest(CustomTestCase):
         class E(TypeEnum):
             A = {"x": int, "y": str}
             B = {"val": bool}
-            C = {}  # type: ignore[var-annotated]
 
         a = E.A(x=3, y="foo")
         match a:
@@ -65,13 +64,6 @@ class MatchingTest(CustomTestCase):
                 self.assertFalse(k)
             case _:
                 self.fail(f"not matched: {b}")
-
-        c = E.C()
-        match c:
-            case E.C():
-                pass
-            case _:
-                self.fail(f"not matched: {c}")
 
     def test_exhaustiveness(self) -> None:
         class Color(TypeEnum):

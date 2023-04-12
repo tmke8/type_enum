@@ -33,6 +33,10 @@ class TypeEnumMeta(type):
             if isinstance(types, tuple):
                 subtype = _create_tuple_class(name, attr_name, types)
             elif isinstance(types, dict):
+                if not types:
+                    raise TypeError(
+                        f"Dictionaries in TypeEnum may not be empty. Found empty '{attr_name}' in '{name}'."
+                    )
                 for k in types:
                     if k in ns:
                         raise TypeError(

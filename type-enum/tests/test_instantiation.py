@@ -31,7 +31,7 @@ class InstantiationTest(CustomTestCase):
         class E(TypeEnum):
             A = {"x": int, "y": str}
             B = {"val": bool}
-            C = {}  # type: ignore[var-annotated]
+            C = ()
 
         E.A(x=3, y="foo")
         E.A(3, y="foo")
@@ -108,3 +108,9 @@ class InstantiationTest(CustomTestCase):
 
             class E(TypeEnum):  # type: ignore[misc]
                 pass
+
+    def test_empty_dict(self) -> None:
+        with self.assertRaises(TypeError):
+
+            class E(TypeEnum):
+                A = {}  # type: ignore[var-annotated]

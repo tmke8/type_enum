@@ -13,14 +13,12 @@ class RepresentationsTest(CustomTestCase):
             C = ()
             D = {"x": int, "y": str}
             E = {"val": bool}
-            F = {}  # type: ignore[var-annotated]
 
         self.assertEqual(repr(E.A(3)), "E.A(3)")
         self.assertEqual(repr(E.B(0, "foo")), "E.B(0, 'foo')")
         self.assertEqual(repr(E.C()), "E.C()")
         self.assertEqual(repr(E.D(3, "bar")), "D(x=3, y='bar')")
         self.assertEqual(repr(E.E(True)), "E(val=True)")
-        self.assertEqual(repr(E.F()), "F()")
 
     def test_docstring(self) -> None:
         class E(TypeEnum):

@@ -9,7 +9,6 @@ class MiscTest(CustomTestCase):
             A = (int,)
             B = ()
             C = {"x": int, "y": str}
-            D = {}  # type: ignore[var-annotated]
 
         TA: type[E] = E.A
         a: E = E.A(3)
@@ -28,10 +27,6 @@ class MiscTest(CustomTestCase):
         self.assertIsSubclass(E.C, E)
         self.assertIsInstance(E.C(3, y="foo"), E)
         self.assertIsInstance(E.C(3, y="foo"), E.C)
-
-        self.assertIsSubclass(E.D, E)
-        self.assertIsInstance(E.D(), E)
-        self.assertIsInstance(E.D(), E.D)
 
     def test_not_subclass(self) -> None:
         class E(TypeEnum):
