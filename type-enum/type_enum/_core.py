@@ -60,7 +60,7 @@ class TypeEnumMeta(type):
         ns["__init__"] = _init
         subtypes = list(member_map.values())
         if name != "TypeEnum":
-            ns["ALL"] = functools.reduce(or_, subtypes[1:], Union[subtypes[0]])
+            ns["T"] = functools.reduce(or_, subtypes[1:], Union[subtypes[0]])
         try:
             exc = None
             enum_class = super().__new__(cls, name, bases, ns)

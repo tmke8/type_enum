@@ -78,7 +78,7 @@ class MatchingTest(CustomTestCase):
             transparent = ()
             name = (str,)
 
-        def f(color: Color.ALL) -> int:
+        def f(color: Color.T) -> int:
             match color:
                 case Color.transparent():
                     return 0

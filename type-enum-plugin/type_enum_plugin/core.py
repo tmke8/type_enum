@@ -163,7 +163,7 @@ class TypeEnumTransform:
                 existing.node = alias
                 breakpoint()
 
-        existing = self.api.lookup_qualified("ALL", self.cls)
+        existing = self.api.lookup_qualified("T", self.cls)
         if (
             existing is None
             or existing.node is None
@@ -174,12 +174,12 @@ class TypeEnumTransform:
             )
             alias = TypeAlias(
                 typ,
-                self.api.qualified_name("ALL"),
+                self.api.qualified_name("T"),
                 self.reason.line,
                 self.reason.column,
             )
             aliasnode = SymbolTableNode(MDEF, alias)
-            self.api.add_symbol_table_node("ALL", aliasnode)
+            self.api.add_symbol_table_node("T", aliasnode)
 
     def get_type_from_expression(self, type_node: Expression) -> Type | None:
         try:
