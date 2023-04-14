@@ -61,8 +61,16 @@ class InstantiationTest(CustomTestCase):
             A = (U,)  # type: ignore[misc]
             B = ()
 
-        E[int]
-        E[int].A(3)
+        a = E.A[int](3)
+
+        def f(x: E.T[int]) -> int:
+            match x:
+                case E.A(y):
+                    return y
+                case E.B():
+                    return 0
+
+        self.assertEqual(f(a), 3)
 
     def test_invalid_body(self) -> None:
         with self.assertRaises(TypeError):

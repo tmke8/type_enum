@@ -49,7 +49,7 @@ class TypeEnumTransform:
         """Transform the attributes in a TypeEnum."""
         cls = self.cls
         cls.info.is_final = True
-        variants: list[tuple[TypeInfo, int]] = []
+        variants: list[tuple[TypeInfo, list[TypeVarLikeType]]] = []
         error_reported = False
 
         if len(cls.info.bases) > 1:
@@ -102,7 +102,7 @@ class TypeEnumTransform:
 
             if isinstance(node, TypeInfo):
                 # we'll assume that this has already been analyzed
-                variants.append((node, node.line))
+                variants.append((node, node.defn.type_vars))
                 continue
 
             assert isinstance(node, Var), type(node)
@@ -122,11 +122,13 @@ class TypeEnumTransform:
             if isinstance(stmt.rvalue, TupleExpr):
                 types: list[Type] = []
                 aborted = False
+                tvars: list[TypeVarLikeType] = []
                 # tvar_defs = self.get_and_bind_all_tvars(stmt.rvalue.items)
                 for type_node in stmt.rvalue.items:
                     analyzed = self.get_type_from_expression(type_node)
                     if isinstance(analyzed, TypeVarLikeType):
-                        analyzed = AnyType(TypeOfAny.implementation_artifact)
+                        # analyzed = AnyType(TypeOfAny.implementation_artifact)
+                        tvars.append(analyzed)
                     if analyzed is None:
                         aborted = True
                         break
@@ -136,7 +138,11 @@ class TypeEnumTransform:
                 info = self.create_namedtuple(
                     lhs.name, [f"_{i}" for i in range(len(types))], types, stmt.line
                 )
-                variants.append((info, stmt.line))
+                if tvars:
+                    info.type_vars = []
+                    info.defn.type_vars = tvars
+                    info.add_type_vars()
+                variants.append((info, tvars))
             elif isinstance(stmt.rvalue, DictExpr):
                 if not stmt.rvalue.items:
                     self.api.fail("Dictionaries in a TypeEnum may not be empty", stmt)
@@ -165,7 +171,7 @@ class TypeEnumTransform:
                 info = self.create_namedtuple(
                     lhs.name, fieldnames, fieldtypes, stmt.line
                 )
-                variants.append((info, stmt.line))
+                variants.append((info, []))
             else:
                 self.api.fail("Only tuples or dicts are allowed in a TypeEnum", stmt)
                 error_reported = True
@@ -180,13 +186,14 @@ class TypeEnumTransform:
             or not isinstance(existing.node, TypeAlias)
         ):
             typ = UnionType.make_union(
-                [Instance(typ, [], line) for typ, line in variants]
+                [Instance(typ, type_vars, typ.line) for typ, type_vars in variants]
             )
             alias = TypeAlias(
                 typ,
                 self.api.qualified_name("T"),
                 self.reason.line,
                 self.reason.column,
+                alias_tvars=cls.info.defn.type_vars,
             )
             aliasnode = SymbolTableNode(MDEF, alias)
             self.api.add_symbol_table_node("T", aliasnode)
