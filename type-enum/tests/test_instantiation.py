@@ -57,18 +57,38 @@ class InstantiationTest(CustomTestCase):
     def test_generic(self) -> None:
         U = TypeVar("U")
 
-        class E(TypeEnum, Generic[U]):
-            A = (U,)  # type: ignore[misc]
-            B = ()
+        class Maybe(TypeEnum, Generic[U]):
+            Some = (U,)  # type: ignore[misc]
+            Nothing = ()
 
-        a = E.A[int](3)
+        a = Maybe.Some[int](3)
 
-        def f(x: E.T[int]) -> int:
+        def f(x: Maybe.T[int]) -> int:
+            match x:
+                case Maybe.Some(y):
+                    return y
+                case Maybe.Nothing():
+                    return 0
+
+        self.assertEqual(f(a), 3)
+
+    def test_generic_multi(self) -> None:
+        U = TypeVar("U")
+        V = TypeVar("V")
+
+        class E(TypeEnum, Generic[U, V]):
+            A = (V,)  # type: ignore[misc]
+            B = (int, U)  # type: ignore[misc]
+
+        a = E.A(3)
+
+        def f(x: E.T[str, int]) -> int:
             match x:
                 case E.A(y):
                     return y
-                case E.B():
-                    return 0
+                case E.B(u, v):
+                    assert_type(v, str)
+                    return u
 
         self.assertEqual(f(a), 3)
 
