@@ -111,7 +111,9 @@ class TypeEnumTransform:
 
             if stmt.new_syntax:
                 if not isinstance(stmt.rvalue, TempNode):
-                    self.api.fail(f"No type annotations allowed in the assignment style", stmt)
+                    self.api.fail(
+                        f"No type annotations allowed in the assignment style", stmt
+                    )
                     error_reported = True
                     continue
 
@@ -125,7 +127,9 @@ class TypeEnumTransform:
                     continue
                 if isinstance(typ, TypeType) and isinstance(tup := typ.item, TupleType):
                     types: list[Type] = tup.items
-                    tvars = [tvar for tvar in types if isinstance(tvar, TypeVarLikeType)]
+                    tvars = [
+                        tvar for tvar in types if isinstance(tvar, TypeVarLikeType)
+                    ]
                     info = self.create_namedtuple(
                         lhs.name, [f"_{i}" for i in range(len(types))], types, stmt.line
                     )
