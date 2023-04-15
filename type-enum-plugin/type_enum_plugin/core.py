@@ -68,10 +68,6 @@ class TypeEnumTransform:
                     self.api.fail("No function definitions allowed in TypeEnum", stmt)
                     error_reported = True
                 continue
-            elif stmt.new_syntax:
-                self.api.fail("No type annotations allowed in TypeEnum", stmt)
-                error_reported = True
-                continue
 
             # a: int, b: str = 1, 'foo' is not supported syntax so we
             # don't have to worry about it.
@@ -113,11 +109,15 @@ class TypeEnumTransform:
                 error_reported = True
                 continue
 
-            # All other assignments are already type checked.
-            if isinstance(stmt.rvalue, TempNode):
-                self.api.fail("All variables need values.", stmt)
-                error_reported = True
-                continue
+            if stmt.new_syntax:
+                if not isinstance(stmt.rvalue, TempNode):
+                    self.api.fail(f"No type annotations allowed in the assignment style", stmt)
+                    error_reported = True
+                    continue
+                else:
+                    self.api.fail("All variables need values.", stmt)
+                    error_reported = True
+                    continue
 
             if isinstance(stmt.rvalue, TupleExpr):
                 types: list[Type] = []
