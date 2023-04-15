@@ -1,11 +1,12 @@
 import functools
 from operator import itemgetter, or_
 import sys
-from typing import Any, Generic, Iterator, NamedTuple, Union
+from typing import Any, Generic, Iterator, NamedTuple, Tuple, Type, TypeAlias, Union
+from typing_extensions import TypeVarTuple, Unpack
 
 from ._utils import is_dunder, type_to_str
 
-__all__ = ["TypeEnum"]
+__all__ = ["Field", "TypeEnum"]
 
 try:
     from collections import _tuplegetter  # undocumented implementation in C
@@ -138,5 +139,12 @@ def _create_tuple_class(basename: str, typename: str, types: tuple[type, ...]) -
 
 
 class TypeEnum(metaclass=TypeEnumMeta):
+    T: Any
+
     def __init_subclass__(cls, *args: Any, **kwargs: Any):
         super().__init_subclass__(*args, **kwargs)
+
+
+_Ts = TypeVarTuple("_Ts")
+
+Field: TypeAlias = Type[Tuple[Unpack[_Ts]]]
