@@ -26,8 +26,11 @@ from mypy.semanal_namedtuple import NamedTupleAnalyzer
 from mypy.types import (
     AnyType,
     Instance,
+    TupleType,
     Type,
+    TypeAliasType,
     TypeOfAny,
+    TypeType,
     TypeVarLikeType,
     UnboundType,
     UnionType,
@@ -113,6 +116,18 @@ class TypeEnumTransform:
                 if not isinstance(stmt.rvalue, TempNode):
                     self.api.fail(f"No type annotations allowed in the assignment style", stmt)
                     error_reported = True
+                    continue
+
+                typ = stmt.type
+                if isinstance(typ, TypeAliasType) and typ.alias is not None:
+                    typ = typ.alias.target
+
+                if isinstance(typ, TypeType) and isinstance(tup := typ.item, TupleType):
+                    types: list[Type] = tup.items
+                    info = self.create_namedtuple(
+                        lhs.name, [f"_{i}" for i in range(len(types))], types, stmt.line
+                    )
+                    variants.append((info, []))
                     continue
                 else:
                     self.api.fail("All variables need values.", stmt)
