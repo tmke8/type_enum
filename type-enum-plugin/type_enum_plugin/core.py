@@ -8,8 +8,8 @@ from mypy.nodes import (
     ClassDef,
     DictExpr,
     Expression,
-    MDEF,
     FuncDef,
+    MDEF,
     NameExpr,
     PlaceholderNode,
     Statement,
@@ -26,6 +26,7 @@ from mypy.semanal_namedtuple import NamedTupleAnalyzer
 from mypy.types import (
     AnyType,
     Instance,
+    ProperType,
     TupleType,
     Type,
     TypeAliasType,
@@ -94,9 +95,6 @@ class TypeEnumTransform:
                     node,
                 )
                 error_reported = True
-                # Skip processing this node. This doesn't match the runtime behaviour,
-                # but the only alternative would be to modify the SymbolTable,
-                # and it's a little hairy to do that in a plugin.
                 continue
 
             if isinstance(node, TypeInfo):
@@ -106,7 +104,6 @@ class TypeEnumTransform:
 
             assert isinstance(node, Var), type(node)
 
-            # x: ClassVar[int] is ignored by dataclasses.
             if node.is_classvar:
                 self.api.fail("No ClassVars in TypeEnum.", node)
                 error_reported = True
@@ -122,12 +119,28 @@ class TypeEnumTransform:
                 if isinstance(typ, TypeAliasType) and typ.alias is not None:
                     typ = typ.alias.target
 
+                if isinstance(typ, UnboundType):
+                    # type is not ready yet?
+                    # TODO: signal somehow that this type needs to be resolved
+                    continue
                 if isinstance(typ, TypeType) and isinstance(tup := typ.item, TupleType):
                     types: list[Type] = tup.items
+                    tvars = [tvar for tvar in types if isinstance(tvar, TypeVarLikeType)]
                     info = self.create_namedtuple(
                         lhs.name, [f"_{i}" for i in range(len(types))], types, stmt.line
                     )
-                    variants.append((info, []))
+                    if tvars:
+                        info.type_vars = []
+                        info.defn.type_vars = tvars
+                        info.add_type_vars()
+                        assert info.special_alias is not None
+                        info.special_alias.alias_tvars = list(tvars)
+                        target = info.special_alias.target
+                        assert isinstance(target, ProperType)
+                        if isinstance(target, TupleType):
+                            target.partial_fallback.args = tuple(tvars)
+
+                    variants.append((info, tvars))
                     continue
                 else:
                     self.api.fail("All variables need values.", stmt)
