@@ -35,6 +35,7 @@ from mypy.types import (
     TypeVarLikeType,
     UnboundType,
     UnionType,
+    get_proper_type,
 )
 
 __all__ = ["plugin"]
@@ -118,13 +119,14 @@ class TypeEnumTransform:
                     continue
 
                 typ = stmt.type
-                if isinstance(typ, TypeAliasType) and typ.alias is not None:
-                    typ = typ.alias.target
 
-                if isinstance(typ, UnboundType):
-                    # type is not ready yet?
-                    # TODO: signal somehow that this type needs to be resolved
-                    continue
+                if typ is not None:
+                    typ = self.api.anal_type(typ)
+                    if typ is None:
+                        self.api.defer()  # type is not ready -- we defer
+                        return
+                    typ = get_proper_type(typ)  # resolve type aliases
+
                 if isinstance(typ, TypeType) and isinstance(tup := typ.item, TupleType):
                     types: list[Type] = tup.items
                     tvars = [
@@ -147,7 +149,7 @@ class TypeEnumTransform:
                     variants.append((info, tvars))
                     continue
                 else:
-                    self.api.fail("All variables need values.", stmt)
+                    self.api.fail(f"Invalid field definition: '{lhs.name}'", stmt)
                     error_reported = True
                     continue
 
@@ -211,12 +213,16 @@ class TypeEnumTransform:
         if not variants and not error_reported:
             self.api.fail("Empty TypeEnum.", self.cls)
 
-        existing = self.api.lookup_qualified("T", self.cls)
-        if (
-            existing is None
-            or existing.node is None
-            or not isinstance(existing.node, TypeAlias)
-        ):
+        # NOTE: previously, I had to guard the following,
+        # but somehow this became unnecessary
+
+        # existing = self.api.lookup_qualified("T", self.cls)
+        # if (
+        #     existing is None
+        #     or existing.node is None
+        #     or not isinstance(existing.node, TypeAlias)
+        # ):
+        if True:
             typ = UnionType.make_union(
                 [Instance(typ, type_vars, typ.line) for typ, type_vars in variants]
             )
