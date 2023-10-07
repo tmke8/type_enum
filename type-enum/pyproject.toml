@@ -5,21 +5,20 @@ description = "Concise sum types in Python."
 authors = ["Thomas MK <tmke8@posteo.net>"]
 license = "Apache License 2.0"
 readme = "README.md"
-packages = [{include = "type_enum"}]
-include=["type_enum/py.typed"]
-classifiers=[
+packages = [{ include = "type_enum" }]
+include = ["type_enum/py.typed"]
+classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
-repository="https://github.com/tmke8/type_enum"
+repository = "https://github.com/tmke8/type_enum"
 
 [tool.poetry.dependencies]
 python = "^3.10"
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.1.0"
 ruff = "^0.0.254"
 mypy = "^1.0.1"
 type-enum-plugin = { path = "../type-enum-plugin", develop = true }
@@ -29,12 +28,14 @@ typing-extensions = "^4.5.0"
 plugins = "type_enum_plugin"
 strict = true
 warn_unused_ignores = true
+# python_version = "3.11"
 
 [[tool.mypy.overrides]]
 module = ["type_enum.*"]
 ignore_errors = true
 
 [tool.ruff]
+line-length = 88
 select = [
     "I", # isort
 ]
