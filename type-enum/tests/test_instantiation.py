@@ -59,7 +59,7 @@ class InstantiationTest(CustomTestCase):
         U = TypeVar("U")
 
         class Maybe(TypeEnum, Generic[U]):
-            Some: Type[Tuple[U]]  # type: ignore[misc]
+            Some: Type[Tuple[U]]
             Nothing: Type[Tuple[()]]
 
         a = Maybe.Some[int](3)
@@ -79,7 +79,7 @@ class InstantiationTest(CustomTestCase):
 
         class E(TypeEnum, Generic[U, V]):
             A: Type[Tuple[V]]
-            B: Type[Tuple[int, U]]  # type: ignore[misc]
+            B: Type[Tuple[int, U]]
 
         a = E.A(3)
 
