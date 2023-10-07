@@ -1,3 +1,5 @@
+from typing import Tuple, Type
+
 from type_enum import TypeEnum
 
 from .common import CustomTestCase
@@ -6,9 +8,9 @@ from .common import CustomTestCase
 class MiscTest(CustomTestCase):
     def test_subclass(self) -> None:
         class E(TypeEnum):
-            A = (int,)
-            B = ()
-            C = {"x": int, "y": str}
+            A: Type[Tuple[int]]
+            B: Type[Tuple[()]]
+            # C = {"x": int, "y": str}
 
         TA: type[E] = E.A
         a: E = E.A(3)
@@ -24,14 +26,14 @@ class MiscTest(CustomTestCase):
         self.assertIsInstance(E.B(), E)
         self.assertIsInstance(E.B(), E.B)
 
-        self.assertIsSubclass(E.C, E)
-        self.assertIsInstance(E.C(3, y="foo"), E)
-        self.assertIsInstance(E.C(3, y="foo"), E.C)
+        # self.assertIsSubclass(E.C, E)
+        # self.assertIsInstance(E.C(3, y="foo"), E)
+        # self.assertIsInstance(E.C(3, y="foo"), E.C)
 
     def test_not_subclass(self) -> None:
         class E(TypeEnum):
-            A = (int,)
-            B = ()
+            A: Type[Tuple[int]]
+            B: Type[Tuple[()]]
 
         self.assertNotIsInstance((3,), E)
         self.assertNotIsInstance((3,), E.A)

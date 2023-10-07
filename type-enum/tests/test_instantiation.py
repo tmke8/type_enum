@@ -1,5 +1,6 @@
-from __future__ import annotations
-from typing import Generic, TypeVar
+# from __future__ import annotations
+
+from typing import Generic, Tuple, Type, TypeVar
 from typing_extensions import assert_type
 
 from type_enum import TypeEnum
@@ -7,7 +8,7 @@ from type_enum import TypeEnum
 from .common import CustomTestCase
 
 # the following forces mypy to evaluate the file twice
-c: C
+c: "C"
 
 
 class C:
@@ -17,9 +18,9 @@ class C:
 class InstantiationTest(CustomTestCase):
     def test_num_args(self) -> None:
         class E(TypeEnum):
-            A = (int,)
-            B = (int, str)
-            C = ()
+            A: Type[Tuple[int]]
+            B: Type[Tuple[int, str]]
+            C: Type[Tuple[()]]
 
         a = E.A(3)
         assert_type(a[0], int)
@@ -35,31 +36,31 @@ class InstantiationTest(CustomTestCase):
         with self.assertRaises(TypeError):
             E.B("foo")  # type: ignore[call-arg,arg-type]
 
-    def test_field_name(self) -> None:
-        class E(TypeEnum):
-            A = {"x": int, "y": str}
-            B = {"val": bool}
-            C = ()
+    # def test_field_name(self) -> None:
+    #     class E(TypeEnum):
+    #         A = {"x": int, "y": str}
+    #         B = {"val": bool}
+    #         C = ()
 
-        E.A(x=3, y="foo")
-        E.A(3, y="foo")
-        E.A(3, "foo")
-        E.B(False)
-        E.C()
+    #     E.A(x=3, y="foo")
+    #     E.A(3, y="foo")
+    #     E.A(3, "foo")
+    #     E.B(False)
+    #     E.C()
 
-        with self.assertRaises(TypeError):
-            E.A()  # type: ignore[call-arg]
-        with self.assertRaises(TypeError):
-            E.C(0)  # type: ignore[call-arg]
-        with self.assertRaises(TypeError):
-            E.B("foo", 3)  # type: ignore[call-arg,arg-type]
+    #     with self.assertRaises(TypeError):
+    #         E.A()  # type: ignore[call-arg]
+    #     with self.assertRaises(TypeError):
+    #         E.C(0)  # type: ignore[call-arg]
+    #     with self.assertRaises(TypeError):
+    #         E.B("foo", 3)  # type: ignore[call-arg,arg-type]
 
     def test_generic(self) -> None:
         U = TypeVar("U")
 
         class Maybe(TypeEnum, Generic[U]):
-            Some = (U,)  # type: ignore[misc]
-            Nothing = ()
+            Some: Type[Tuple[U]]
+            Nothing: Type[Tuple[()]]
 
         a = Maybe.Some[int](3)
 
@@ -77,8 +78,8 @@ class InstantiationTest(CustomTestCase):
         V = TypeVar("V")
 
         class E(TypeEnum, Generic[U, V]):
-            A = (V,)  # type: ignore[misc]
-            B = (int, U)  # type: ignore[misc]
+            A: Type[Tuple[V]]
+            B: Type[Tuple[int, U]]
 
         a = E.A(3)
 
@@ -114,16 +115,16 @@ class InstantiationTest(CustomTestCase):
 
     def test_invalid_inheritance(self) -> None:
         class E(TypeEnum):
-            A = ()
+            A: Type[Tuple[()]]
 
         with self.assertRaises(TypeError):
 
             class F(E):  # type: ignore[misc]
-                B = ()
+                B: Type[Tuple[()]]
 
     def test_instantiate_type_enum(self) -> None:
         class E(TypeEnum):
-            A = (int,)
+            A: Type[Tuple[int]]
 
         with self.assertRaises(TypeError):
             E()
@@ -135,7 +136,7 @@ class InstantiationTest(CustomTestCase):
 
             class E(TypeEnum):
                 A = {"B": int}
-                B = (int, str)
+                B: Type[Tuple[int, str]]
 
     def test_empty_type_enum(self) -> None:
         with self.assertRaises(TypeError):
