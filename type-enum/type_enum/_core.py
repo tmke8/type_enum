@@ -60,6 +60,8 @@ class TypeEnumMeta(type):
                     f"but found '{wrapped_types}'"
                 )
             inner = get_args(wrapped_types)[0]
+            if len(inner) == 1 and inner[0] == ():
+                inner = ()
             if get_origin(inner) is not tuple:
                 raise TypeError(
                     f"Expected type annotation for '{attr_name}' to be a Type[Tuple[...]], "
