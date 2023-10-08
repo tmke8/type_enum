@@ -8,19 +8,19 @@ readme = "README.md"
 packages = [{ include = "type_enum" }]
 include = ["type_enum/py.typed"]
 classifiers = [
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
 repository = "https://github.com/tmke8/type_enum"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.0.254"
-mypy = "^1.0.1"
+mypy = "^1.5.1"
 type-enum-plugin = { path = "../type-enum-plugin", develop = true }
 typing-extensions = "^4.5.0"
 
@@ -28,7 +28,7 @@ typing-extensions = "^4.5.0"
 plugins = "type_enum_plugin"
 strict = true
 warn_unused_ignores = true
-# python_version = "3.11"
+python_version = "3.11"
 
 [[tool.mypy.overrides]]
 module = ["type_enum.*"]
@@ -42,7 +42,8 @@ select = [
 
 [tool.ruff.isort]
 known-third-party = ["mypy", "pytest"]
-extra-standard-library = ["__future__", "typing_extensions"]
+extra-standard-library = ["typing_extensions"]
+no-lines-before = ["future", "standard-library"]
 force-sort-within-sections = true
 split-on-trailing-comma = false
 #classes = []

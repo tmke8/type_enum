@@ -1,6 +1,6 @@
 from typing import Tuple, Type
 
-from type_enum import TypeEnum
+from type_enum import Field, TypeEnum
 
 from .common import CustomTestCase
 
@@ -8,7 +8,8 @@ from .common import CustomTestCase
 class MiscTest(CustomTestCase):
     def test_subclass(self) -> None:
         class E(TypeEnum):
-            A: Type[Tuple[int]]
+            # A: Type[Tuple[int]]
+            A: Field[int]
             B: Type[Tuple[()]]
             # C = {"x": int, "y": str}
 

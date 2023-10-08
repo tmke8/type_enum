@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-from re import T
-from typing import Tuple, Type
-
 from type_enum import TypeEnum
 
 from .common import CustomTestCase
@@ -18,9 +15,9 @@ class C:
 class MatchingTest(CustomTestCase):
     def test_tuple_matching(self) -> None:
         class E(TypeEnum):
-            A: Type[Tuple[int]]
-            B: Type[Tuple[int, str]]
-            C: Type[Tuple[()]]
+            A: type[tuple[int]]
+            B: type[tuple[int, str]]
+            C: type[tuple[()]]
 
         a = E.A(3)
         match a:
@@ -68,8 +65,8 @@ class MatchingTest(CustomTestCase):
 
     def test_exhaustiveness(self) -> None:
         class Color(TypeEnum):
-            transparent: Type[Tuple[()]]
-            name: Type[Tuple[str]]
+            transparent: type[tuple[()]]
+            name: type[tuple[str]]
 
         def f(color: Color.T) -> int:
             match color:
