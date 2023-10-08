@@ -78,7 +78,7 @@ The requirement to use `.T` is a limitation of the mypy plugin, and hopefully wi
 
 ### Generics
 
-The `.T` attribute can also be used to specify generic type arguments:
+The `.T` attribute can also be used to specify type arguments for generic `TypeEnum`s:
 
 ```python
 from typing import Generic, Tuple, Type, TypeVar
