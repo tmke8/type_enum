@@ -20,7 +20,21 @@ mypy = "*"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.0.1"
-ruff = "^0.0.254"
+ruff = ">=0.0.292"
+
+[tool.ruff]
+line-length = 88
+select = [
+    "I", # isort
+]
+
+[tool.ruff.isort]
+known-third-party = ["mypy", "pytest"]
+extra-standard-library = ["typing_extensions"]
+no-lines-before = ["future", "standard-library"]
+force-sort-within-sections = true
+split-on-trailing-comma = false
+classes = ["MDEF"]
 
 [build-system]
 requires = ["poetry-core"]

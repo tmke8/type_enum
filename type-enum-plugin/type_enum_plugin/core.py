@@ -29,7 +29,6 @@ from mypy.types import (
     ProperType,
     TupleType,
     Type,
-    TypeAliasType,
     TypeOfAny,
     TypeType,
     TypeVarLikeType,
@@ -44,8 +43,8 @@ __all__ = ["plugin"]
 @dataclass(kw_only=True)
 class TypeEnumTransform:
     cls: ClassDef
-    # Statement must also be accepted since class definition itself may be passed as the reason
-    # for subclass/metaclass-based uses of `typing.dataclass_transform`
+    # Statement must also be accepted since class definition itself may be passed as the
+    # reason for subclass/metaclass-based uses of `typing.dataclass_transform`
     reason: Expression | Statement
     # spec: DataclassTransformSpec
     api: SemanticAnalyzerPluginInterface
@@ -113,7 +112,7 @@ class TypeEnumTransform:
             if stmt.new_syntax:
                 if not isinstance(stmt.rvalue, TempNode):
                     self.api.fail(
-                        f"No type annotations allowed in the assignment style", stmt
+                        "No type annotations allowed in the assignment style", stmt
                     )
                     error_reported = True
                     continue
@@ -170,7 +169,7 @@ class TypeEnumTransform:
                 if aborted:
                     continue
                 info = self.create_namedtuple(
-                    lhs.name, [f"_{i}" for i in range(len(types))], types, stmt.line
+                    lhs.name, [f"field{i}" for i in range(len(types))], types, stmt.line
                 )
                 if tvars:
                     info.type_vars = []
@@ -295,4 +294,25 @@ def type_enum_callback(ctx: ClassDefContext) -> None:
 
 def plugin(version: str) -> type[TypeEnumPlugin]:
     # ignore version argument if the plugin works with all mypy versions.
+    parsed = parse_mypy_version(version)
+    if parsed < (1, 5):
+        raise RuntimeError("type-enum-plugin requires mypy >= 1.5.0")
     return TypeEnumPlugin
+
+
+def parse_mypy_version(version: str) -> tuple[int, ...]:
+    """Parse mypy string version to tuple of ints.
+
+    This function is included here rather than the mypy plugin file because the mypy
+    plugin file cannot be imported outside a mypy run.
+
+    It parses normal version like `0.930` and dev version
+    like `0.940+dev.04cac4b5d911c4f9529e6ce86a27b44f28846f5d.dirty`.
+
+    Args:
+        version: The mypy version string.
+
+    Returns:
+        A tuple of ints. e.g. (0, 930).
+    """
+    return tuple(map(int, version.partition("+")[0].split(".")))
