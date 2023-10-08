@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "type-enum"
-version = "0.2.2a0"
+version = "0.3.0"
 description = "Concise sum types in Python."
 authors = ["Thomas MK <tmke8@posteo.net>"]
 license = "Apache License 2.0"
