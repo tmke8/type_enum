@@ -30,10 +30,10 @@ jobs:
         pip install ruff
     - name: Lint with ruff
       run: |
-        ruff check --format=github type_enum
+        ruff check --format=github type_enum*
     - name: Format with ruff
       run: |
-        ruff format --check type_enum
+        ruff format --check type_enum*
 
 
   run_tests:
