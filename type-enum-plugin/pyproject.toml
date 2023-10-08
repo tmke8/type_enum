@@ -7,19 +7,19 @@ license = "Apache License 2.0"
 readme = "README.md"
 packages = [{ include = "type_enum_plugin" }]
 classifiers = [
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
 repository = "https://github.com/tmke8/type_enum"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 mypy = "*"
 
 [tool.poetry.group.dev.dependencies]
-mypy = "^1.0.1"
+mypy = "^1.5"
 ruff = ">=0.0.292"
 
 [tool.ruff]
