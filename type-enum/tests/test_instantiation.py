@@ -77,6 +77,9 @@ class InstantiationTest(CustomTestCase):
         with self.assertRaises(TypeError):
             Maybe.Some[int, str](3)  # type: ignore[misc]
 
+        with self.assertRaises(TypeError):
+            Maybe.T[int, str]  # type: ignore[misc,type-arg]
+
     def test_generic_multi(self) -> None:
         U = TypeVar("U")
         V = TypeVar("V")
@@ -97,6 +100,13 @@ class InstantiationTest(CustomTestCase):
 
         self.assertEqual(f(a), 3)
         self.assertEqual(repr(a), "E.A(3)")
+
+    def test_generic_without_base_class(self) -> None:
+        U = TypeVar("U")
+
+        class Maybe(TypeEnum):
+            Some: Type[Tuple[U]]  # type: ignore[valid-type]
+            Nothing: Type[Tuple[()]]
 
     def test_invalid_body(self) -> None:
         with self.assertRaises(TypeError):
