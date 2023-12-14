@@ -80,4 +80,4 @@ jobs:
           poetry install --no-interaction --no-root
       - name: Run type check
         run: |
-          poetry run mypy tests --enable-incomplete-feature=TypeVarTuple --enable-incomplete-feature=Unpack
+          poetry run mypy tests

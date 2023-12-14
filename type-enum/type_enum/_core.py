@@ -1,5 +1,6 @@
 import functools
 from operator import or_
+from types import new_class
 from typing import (
     Any,
     Generic,
@@ -60,12 +61,15 @@ class TypeEnumMeta(type):
             if len(types) == 1 and types[0] == ():
                 types = ()
             # subtype = _create_tuple_class(name, attr_name, types)
-            subtype = _create_subclass(name, attr_name, types)
+            typevars: tuple[type, ...] = tuple(
+                typ for typ in types if isinstance(typ, TypeVar)
+            )
+            subtype = _create_subclass(
+                name, attr_name, types, typevars, ns["__module__"]
+            )
 
             ns[attr_name] = subtype
-            member_map[attr_name] = Entry(
-                subtype, tuple(typ for typ in types if isinstance(typ, TypeVar))
-            )
+            member_map[attr_name] = Entry(subtype, typevars)
 
         for attr_name in ns:
             if not is_dunder(attr_name) and attr_name not in typ_anns:
@@ -112,19 +116,32 @@ class TypeEnumMeta(type):
         return (typ for typ, _ in cls._member_map.values())
 
 
-def _create_subclass(basename: str, typename: str, types: tuple[type, ...]):
-    subtype = NamedTuple(typename, [(f"field{i}", typ) for i, typ in enumerate(types)])
+def _create_subclass(
+    basename: str,
+    typename: str,
+    types: tuple[type, ...],
+    typevars: tuple[type, ...],
+    module: str,
+) -> type:
+    def body(namespace: dict[str, Any]) -> None:
+        namespace["__module__"] = module
+        namespace["__annotations__"] = {f"field{i}": typ for i, typ in enumerate(types)}
+        num_values = len(types)
+        repr_fmt = "(" + ", ".join("%r" for _ in range(num_values)) + ")"
+
+        def __repr__(self) -> str:
+            "Return a nicely formatted representation string"
+            return basename + "." + self.__class__.__name__ + repr_fmt % tuple(self)
+
+        namespace["__repr__"] = __repr__
+
+    baseclasses = (NamedTuple,)
+    if typevars:
+        baseclasses += (Generic[*typevars],)
+    subtype = new_class(typename, baseclasses, exec_body=body)
     subtype.__doc__ = (
         f"{basename}.{typename}(" + ", ".join(type_to_str(typ) for typ in types) + ")"
     )
-    num_values = len(types)
-    repr_fmt = "(" + ", ".join("%r" for _ in range(num_values)) + ")"
-
-    def __repr__(self) -> str:
-        "Return a nicely formatted representation string"
-        return basename + "." + self.__class__.__name__ + repr_fmt % tuple(self)
-
-    subtype.__repr__ = __repr__
     return subtype
 
 

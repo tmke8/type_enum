@@ -31,13 +31,13 @@ match background_color:
 
 ## Installation
 
-Requires Python >= 3.11
+Requires Python >= 3.11 (because features from PEP 646 are required)
 
 ```
 pip install type-enum
 ```
 
-And for the mypy plugin (requires mypy >= 1.5):
+And for the mypy plugin (requires mypy >= 1.7):
 ```
 pip install type-enum-plugin
 ```
@@ -46,11 +46,6 @@ Then register the plugin with
 ```toml
 [tool.mypy]
 plugins = "type_enum_plugin"
-```
-
-And then run mypy with the following flags (hopefully this soon won't be needed anymore):
-```
---enable-incomplete-feature=TypeVarTuple --enable-incomplete-feature=Unpack
 ```
 
 ## Advanced usage

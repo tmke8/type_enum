@@ -72,6 +72,10 @@ class InstantiationTest(CustomTestCase):
                     return 0
 
         self.assertEqual(f(a), 3)
+        self.assertEqual(repr(Maybe.Some), "<class 'tests.test_instantiation.Some'>")
+
+        with self.assertRaises(TypeError):
+            Maybe.Some[int, str](3)  # type: ignore[misc]
 
     def test_generic_multi(self) -> None:
         U = TypeVar("U")
@@ -92,6 +96,7 @@ class InstantiationTest(CustomTestCase):
                     return u
 
         self.assertEqual(f(a), 3)
+        self.assertEqual(repr(a), "E.A(3)")
 
     def test_invalid_body(self) -> None:
         with self.assertRaises(TypeError):
