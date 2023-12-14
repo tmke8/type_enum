@@ -20,7 +20,7 @@ python = "^3.11"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.0.254"
-mypy = "^1.5.1"
+mypy = "^1.7.1"
 type-enum-plugin = { path = "../type-enum-plugin", develop = true }
 typing-extensions = "^4.5.0"
 
