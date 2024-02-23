@@ -1,34 +1,42 @@
-[tool.poetry]
+[project]
 name = "type-enum-plugin"
 version = "0.4.1a0"
 description = "Mypy plugin for type-enum."
-authors = ["Thomas MK <tmke8@posteo.net>"]
-license = "Apache License 2.0"
+authors = [
+  { name = "Thomas MK", email = "tmke8@posteo.net" },
+]
+license = { text = "Apache-2.0" }
 readme = "README.md"
-packages = [{ include = "type_enum_plugin" }]
+# packages = [{ include = "type_enum_plugin" }]
 classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
-repository = "https://github.com/tmke8/type_enum"
+requires-python = ">=3.11"
+dependencies = [
+    "mypy",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-mypy = "*"
+[project.urls]
+Documentation = "https://github.com/tmke8/type-enum#readme"
+Issues = "https://github.com/tmke8/type-enum/issues"
+Source = "https://github.com/tmke8/type-enum"
 
-[tool.poetry.group.dev.dependencies]
-mypy = "^1.5"
-ruff = ">=0.0.292"
+[tool.rye]
+managed = true
+dev-dependencies = ["mypy >= 1.5", "ruff >= 0.0.292"]
 
 [tool.ruff]
 line-length = 88
+
+[tool.ruff.lint]
 select = [
     "I", # isort
 ]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-third-party = ["mypy", "pytest"]
 extra-standard-library = ["typing_extensions"]
 no-lines-before = ["future", "standard-library"]
@@ -37,5 +45,5 @@ split-on-trailing-comma = false
 classes = ["MDEF"]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -5,6 +5,7 @@ on:
     branches:
     - main
   merge_group:
+
 jobs:
   lint_with_ruff:
 
@@ -19,22 +20,15 @@ jobs:
         working-directory: ${{ matrix.directory }}
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    - name: Install ruff
-      run: |
-        python -m pip install --upgrade pip
-        pip install ruff
-    - name: Lint with ruff
-      run: |
-        ruff check --output-format=github type_enum*
-    - name: Format with ruff
-      run: |
-        ruff format --check type_enum*
-
+      - uses: actions/checkout@v3
+      - name: Install rye
+        uses: eifinger/setup-rye@v1
+      - name: Lint with ruff
+        run: |
+          rye lint -- --output-format=github
+      - name: Format with ruff
+        run: |
+          rye fmt -- --diff type_enum*
 
   run_tests:
     runs-on: ubuntu-latest
@@ -45,19 +39,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Install poetry
-        run: pipx install poetry
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+      - name: Install rye
+        uses: eifinger/setup-rye@v1
 
       - name: Install dependencies
         run: |
-          poetry env use 3.11
-          poetry install --no-interaction --no-root
+          rye sync --no-lock
       - name: Run tests
         run: |
-          poetry run python -m unittest -v
+          rye run test -v
 
   type_check:
     runs-on: ubuntu-latest
@@ -68,16 +58,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Install poetry
-        run: pipx install poetry
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+      - name: Install rye
+        uses: eifinger/setup-rye@v1
 
       - name: Install dependencies
         run: |
-          poetry env use 3.11
-          poetry install --no-interaction --no-root
+          rye sync --no-lock
       - name: Run type check
         run: |
-          poetry run mypy tests
+          rye run mypy tests

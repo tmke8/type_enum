@@ -7,7 +7,7 @@ set -e
 version_bump=$1
 
 case $version_bump in
-  "patch" | "minor" | "major" | "prepatch" | "preminor" | "premajor" | "prerelease")
+  "patch" | "minor" | "major")
     echo "valid version bump: $version_bump"
     ;;
   *)
@@ -47,7 +47,7 @@ bump_build_publish() {
   echo "#######################################"
   echo "#            bump version             #"
   echo "#######################################"
-  poetry version $version_bump
+  rye version -b $version_bump
 
   echo "#######################################"
   echo "#         stage pyroject.toml         #"
@@ -57,7 +57,7 @@ bump_build_publish() {
   echo "#######################################"
   echo "#            do new build             #"
   echo "#######################################"
-  poetry build
+  rye build
 
   echo ""
   echo "#######################################"
@@ -65,7 +65,7 @@ bump_build_publish() {
   echo "#######################################"
   # to use this, set up an API token with
   #  `poetry config pypi-token.pypi <api token>`
-  poetry publish
+  rye publish
 
   echo "#######################################"
   echo "#            leaving '$1'             #"
@@ -80,7 +80,7 @@ bump_build_publish "type-enum-plugin"
 
 # get the version from 'type_enum'
 pushd type-enum
-new_version=$(poetry version -s)
+new_version=$(rye version)
 popd
 
 echo "#######################################"

@@ -1,0 +1,11 @@
+[project]
+name = "type-enum-workspace"
+version = "0.0.0"
+requires-python = ">= 3.11"
+
+[tool.rye]
+managed = true
+virtual = true
+
+[tool.rye.workspace]
+members = ["type-enum*"]
