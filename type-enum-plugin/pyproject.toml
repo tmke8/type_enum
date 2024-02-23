@@ -28,9 +28,6 @@ Source = "https://github.com/tmke8/type-enum"
 managed = true
 dev-dependencies = ["mypy >= 1.5", "ruff >= 0.0.292"]
 
-[tool.rye.scripts]
-mypyc = "mypy tests"
-
 [tool.ruff]
 line-length = 88
 

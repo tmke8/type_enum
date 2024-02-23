@@ -66,4 +66,4 @@ jobs:
           rye sync --no-lock
       - name: Run type check
         run: |
-          rye run mypy
+          rye run mypy tests
