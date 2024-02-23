@@ -9,7 +9,7 @@
 
 -e file:type-enum
 -e file:type-enum-plugin
-mypy==1.8.0
+mypy==1.7.1
     # via type-enum-plugin
 mypy-extensions==1.0.0
     # via mypy
