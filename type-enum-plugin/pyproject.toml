@@ -1,6 +1,6 @@
 [project]
 name = "type-enum-plugin"
-version = "0.5.0"
+version = "0.5.1.dev0"
 description = "Mypy plugin for type-enum."
 authors = [
   { name = "Thomas MK", email = "tmke8@posteo.net" },
