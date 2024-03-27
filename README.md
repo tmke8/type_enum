@@ -37,7 +37,7 @@ Requires Python >= 3.11 (because features from PEP 646 are required)
 pip install type-enum
 ```
 
-And for the mypy plugin (requires mypy >= 1.7):
+And for the mypy plugin (requires mypy >= 1.8):
 ```
 pip install type-enum-plugin
 ```

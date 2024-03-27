@@ -9,10 +9,10 @@
 
 -e file:type-enum
 -e file:type-enum-plugin
-mypy==1.7.1
+mypy==1.9.0
     # via type-enum-plugin
 mypy-extensions==1.0.0
     # via mypy
-ruff==0.2.2
-typing-extensions==4.9.0
+ruff==0.3.4
+typing-extensions==4.10.0
     # via mypy

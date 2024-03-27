@@ -28,7 +28,7 @@ Source = "https://github.com/tmke8/type-enum"
 managed = true
 dev-dependencies = [
     "ruff >= 0.0.254",
-    "mypy >= 1.7.1,<1.8.0",
+    "mypy >= 1.8.0",
     "type-enum-plugin @ file:///../type-enum-plugin",
     "typing-extensions >= 4.5.0",
 ]
