@@ -276,7 +276,7 @@ class TypeEnumTransform:
 
     @cached_property
     def namedtuple_builder(self) -> NamedTupleAnalyzer:
-        return NamedTupleAnalyzer(self.api.options, self.api)  # type: ignore
+        return NamedTupleAnalyzer(self.api.options, self.api, self.api.msg)  # type: ignore
 
 
 class TypeEnumPlugin(Plugin):
@@ -295,8 +295,8 @@ def type_enum_callback(ctx: ClassDefContext) -> None:
 def plugin(version: str) -> type[TypeEnumPlugin]:
     # ignore version argument if the plugin works with all mypy versions.
     parsed = parse_mypy_version(version)
-    if parsed < (1, 5):
-        raise RuntimeError("type-enum-plugin requires mypy >= 1.5.0")
+    if parsed < (1, 8):
+        raise RuntimeError("type-enum-plugin requires mypy >= 1.8.0")
     return TypeEnumPlugin
 
 
