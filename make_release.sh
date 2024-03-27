@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# fail on error
+# Fail on error.
 set -e
 
-# confirm the supplied version bump is valid
+# Confirm the supplied version bump is valid.
 version_bump=$1
 
 case $version_bump in
@@ -47,7 +47,18 @@ bump_build_publish() {
   echo "#######################################"
   echo "#            bump version             #"
   echo "#######################################"
-  rye version -b $version_bump
+  # First remove the `.dev0` suffix.
+  if [[ $(rye version) == *.dev0 ]]; then
+    # This just removes all pre-release suffixes.
+    rye version --bump patch
+  else
+    echo "Invalid version suffix. Expected '.dev0'."
+    exit 4
+  fi
+  # If the version bump wasn't "patch", we need to apply the correct bump.
+  if [[ $version_bump != "patch" ]]; then
+    rye version --bump $version_bump
+  fi
 
   echo "#######################################"
   echo "#         stage pyroject.toml         #"
@@ -70,7 +81,7 @@ bump_build_publish() {
   echo "#######################################"
   echo "#            leaving '$1'             #"
   echo "#######################################"
-  popd  # switch back to previous directory
+  popd  # Switch back to previous directory.
 }
 
 cp README.md ./type-enum/
@@ -78,7 +89,7 @@ bump_build_publish "type-enum"
 rm ./type-enum/README.md
 bump_build_publish "type-enum-plugin"
 
-# get the version from 'type_enum'
+# Get the version from 'type_enum'.
 pushd type-enum
 new_version=$(rye version)
 popd
@@ -109,7 +120,9 @@ bump_to_prerelease() {
   echo "#######################################"
   echo "#      bump prerelease version        #"
   echo "#######################################"
-  poetry version prerelease
+  rye version --bump patch
+  next_version=$(rye version)
+  rye version ${next_version}.dev0
 
   echo "#######################################"
   echo "#       commit version change         #"
@@ -134,7 +147,7 @@ git push origin $branch_name $new_tag
 echo "#######################################"
 echo "#     create PR for version bump      #"
 echo "#######################################"
-gh pr create --title "Version bump $new_tag" --body "__Do not use squash merge__ !" --base "main" --label version-bump
+gh pr create --title "Version bump $new_tag" --body "__Please do not squash merge this PR__ !" --base "main" --label version-bump
 # the following command is allowed to fail; hence the "||:" at the end
 gh pr merge $branch_name --merge --admin || :
 
