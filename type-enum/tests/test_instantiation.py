@@ -11,8 +11,7 @@ from .common import CustomTestCase
 c: "C"
 
 
-class C:
-    ...
+class C: ...
 
 
 class InstantiationTest(CustomTestCase):
