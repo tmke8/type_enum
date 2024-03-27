@@ -1,6 +1,6 @@
 [project]
 name = "type-enum"
-version = "0.4.1.dev0"
+version = "0.5.0"
 description = "Concise sum types in Python."
 authors = [
   { name = "Thomas MK", email = "tmke8@posteo.net" },
