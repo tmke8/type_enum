@@ -1,0 +1,9 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    # Look for `requirements.lock` files in the `root` directory
+    directory: "/"
+    # Check the pypi registry for updates every week
+    schedule:
+      interval: "weekly"
+    versioning-strategy: lockfile-only
