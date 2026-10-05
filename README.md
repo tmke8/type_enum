@@ -1,6 +1,7 @@
 # `type_enum`: Concise sum types in Python
 
-(I no longer think this is a good idea, so I'm archiving this.
+> [!WARNING]
+> I no longer think this is a good idea, so I'm archiving this.
 
 Sum types (aka tagged unions) in the style of Rust's `enum`s, with pattern matching and (with the mypy plugin) exhaustiveness checking.
 
